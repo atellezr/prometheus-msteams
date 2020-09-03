@@ -1,7 +1,8 @@
 BINARY = prometheus-msteams
 VET_REPORT = vet.report
 TEST_REPORT = tests.xml
-GOARCH = amd64
+GOARCH = arm
+GOARM = 7
 BINDIR = bin
 VERSION:=$(shell git describe --tags --always --dirty)
 COMMIT=$(shell git rev-parse --short HEAD)
@@ -28,7 +29,7 @@ DOCKER_QUAY_USER=prometheusmsteams+ci
 DOCKER_HUB_REPO=prometheusmsteams/prometheus-msteams
 
 # Build the project
-all: clean dep create_bin_dir linux darwin windows
+all: clean dep create_bin_dir linux #darwin windows
 	cd $(BINDIR) && shasum -a 256 ** > shasum256.txt
 
 create_bin_dir:
@@ -39,7 +40,7 @@ github_release:
 	github-release release -u bzon -r prometheus-msteams -t $(VERSION) -n $(VERSION)
 	
 linux: 
-	CGO_ENABLED=0 GOOS=linux GOARCH=$(GOARCH) $(GO) build $(LDFLAGS) -o $(BINDIR)/$(BINARY)-linux-$(GOARCH) ./cmd/server
+	CGO_ENABLED=0 GOOS=linux GOARCH=$(GOARCH) GOARM=$(GOARM) $(GO) build $(LDFLAGS) -o $(BINDIR)/$(BINARY)-linux-$(GOARCH) ./cmd/server
 
 darwin:
 	CGO_ENABLED=0 GOOS=darwin GOARCH=$(GOARCH) $(GO) build $(LDFLAGS) -o $(BINDIR)/$(BINARY)-darwin-$(GOARCH) ./cmd/server
